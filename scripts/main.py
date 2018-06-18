@@ -1,16 +1,19 @@
 from selenium import webdriver
 import configparser
 
-import getItemsByFeed
-import takeScreenshot
+import readFeed
+import takeFullPageScreenshot
 import exportCsv
 import configparser
 
 def main():
+    extractFeed()
+
+def extractFeed():
     config = loadConfig()
     url = config['url']
 
-    items = getItemsByFeed.execute(url)
+    items = readFeed.execute(url)
     print('Found {} items!'.format(len(items)))
 
     print("Set up web driver ...")
@@ -25,7 +28,7 @@ def main():
         relatorio.append(extractValues(item, counterValue))
 
         fileNamePattern = config['fileNamePattern']
-        takeScreenshot.execute(driver, item['link'], fileNamePattern.format(counterValue))
+        takeFullPageScreenshot.execute(driver, item['link'], fileNamePattern.format(counterValue))
         counter = counter + 1
 
     csvName = config['csvName']
@@ -37,22 +40,22 @@ def loadConfig():
      config = configparser.ConfigParser()
      config.read('config.ini')
 
-     return config['DEFAULT'];
+     return config['DEFAULT']
 
 def setupDriver():
     driver = webdriver.Chrome()
     driver.maximize_window()
-    return driver;
+    return driver
 
 def extractValues(item, counter):
-    returnValue = {};
+    returnValue = {}
     returnValue['id'] = counter
     returnValue['title'] = item['title']
     returnValue['date'] = item['published']
     returnValue['link'] = item['link']
     returnValue['type'] = 'noticia'
 
-    return returnValue;
+    return returnValue
 
 
 if __name__ == "__main__": main()
